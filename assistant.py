@@ -1,8 +1,37 @@
+import sys
 import speech_recognition
 import pyttsx3
 import requests
-import json
-import os
+
+from PyQt6 import uic, QtWidgets
+from PyQt6.QtWidgets import QApplication, QWidget
+
+recognizer = speech_recognition.Recognizer()
+microphone = speech_recognition.Microphone()
+
+ttsEngine = pyttsx3.init()
+
+Form, _ = uic.loadUiType("ai.ui")
+
+class Ui(QtWidgets.QDialog, Form):
+    def __init__(self) -> None:
+        super(Ui, self).__init__()
+        self.setupUi(self)
+        self.pushButton.clicked.connect(self.Start)
+    def Start(*args,**kwargs):
+        while True:
+            words = record()
+            word = words.split()
+            i=len(word)
+            for words_count in range (i):
+                command = word[words_count]
+                if command == "погода":
+                    play_voice_assistant_speech("город")
+                    city = record()
+                    result = weather(city)
+                    print (result)
+                    play_voice_assistant_speech(result)
+
 def play_voice_assistant_speech(text_to_speech):
 
     ttsEngine.say(str(text_to_speech))
@@ -62,23 +91,9 @@ def record():
 
 
 if __name__ == "__main__":
-
-
-    recognizer = speech_recognition.Recognizer()
-    microphone = speech_recognition.Microphone()
-
-    ttsEngine = pyttsx3.init()
-    while True:
-        words = record()
-        word = words.split()
-        i=len(word)
-        for words_count in range (i):
-            command = word[words_count]
-            if command == "погода":
-                play_voice_assistant_speech("город")
-                city = record()
-                result = weather(city)
-                print (result)
-                play_voice_assistant_speech(result)
+        app = QtWidgets.QApplication(sys.argv)
+        w = Ui()
+        w.show()
+        sys.exit(app.exec())
 
 
